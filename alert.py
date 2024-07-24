@@ -1,9 +1,13 @@
 import pandas as pd
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine
+import json
+
+c = open('info.json')
+cred = json.load(c)
 
 # Create SQLAlchemy engine
-engine = create_engine('postgresql+psycopg2://postgres:Rack10020315#@localhost/weather_data')
+engine = create_engine(cred[1]['link'])
 
 def get_daily_temps():
     l = []
@@ -39,8 +43,6 @@ def get_weather_type():
         query = f"SELECT dat, temp, precip, visibility FROM hourly_data WHERE dat = '{num_days.iloc[i]['dat']}'"
         hourly_days = pd.read_sql_query(query,engine)
 
-        x = hours_to_type(hourly_days)
-        print(x)
         l.append(hours_to_type(hourly_days))
 
     return l

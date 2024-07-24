@@ -3,14 +3,11 @@ import pandas as pd
 import psycopg2
 from datetime import datetime, timedelta
 import math
+import json
 
-conn_params = {
-    'dbname': 'weather_data',
-    'user': 'postgres',
-    'password': 'Rack10020315#',
-    'host': 'localhost',
-    'port': '5432'
-}
+c = open('info.json')
+cred = json.load(c)
+conn_params = cred[0]
 
 precip_type = ['RAIN', 'SNOW', 'ICING', 'FREEZING RAIN', 'THUNDERSTORMS']
 

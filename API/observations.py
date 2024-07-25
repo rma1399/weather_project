@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import math
 import json
 
-c = open('info.json')
+c = open('API/info.json')
 cred = json.load(c)
 conn_params = cred[0]
 

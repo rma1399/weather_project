@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import create_engine
 import json
 
-c = open('info.json')
+c = open('API/info.json')
 cred = json.load(c)
 
 # Create SQLAlchemy engine
@@ -20,7 +20,7 @@ def get_daily_temps():
 
 
     for i in range(len(daily_highs)):
-        l.append([daily_highs.iloc[i]['dat'], daily_highs.iloc[i]['max'], daily_lows.iloc[i]['min']])
+        l.append([daily_highs.iloc[i]['dat'], float(daily_highs.iloc[i]['max']), float(daily_lows.iloc[i]['min'])])
 
     return l
 
@@ -75,15 +75,25 @@ def precip_type(dat):
     else:
         return 'Mixed Precipitation'
 
-dates = {}
-temps = get_daily_temps()
-precip = get_daily_precip()
-weather = get_weather_type()
+def data():
+    dates = {}
+    temps = get_daily_temps()
+    precip = get_daily_precip()
+    weather = get_weather_type()
 
-for i in range(len(temps)):
-    temps[i].append(precip[i])
-    temps[i].append(weather[i])
-    dates[temps[i][0]] = temps[i][1:]
-    print(temps[i][0], dates[temps[i][0]], '\n')
+    for i in range(len(temps)):
+        temps[i].append(precip[i])
+        temps[i].append(weather[i])
+        dates[temps[i][0].strftime('%Y-%m-%d')] = temps[i][1:]
 
-#print(dates)
+    return dates
+
+def hourly_data(dat):
+    hours = {}
+    query = f"SELECT * FROM hourly_data WHERE dat = '{dat}'"
+    hourly_nums = pd.read_sql_query(query,engine)
+
+    result_dict = hourly_nums.drop(columns='dat').to_dict(orient='index')
+    hours = {tim: {k: v for k, v in values.items()} for tim, values in result_dict.items()}
+
+    return hours

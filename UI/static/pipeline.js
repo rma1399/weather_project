@@ -63,7 +63,7 @@ function createHourlyHtml(date, data) {
         </tr>`;
     }
     htmlContent += '</table>';
-    htmlContent += '<button onclick="main()">Back</button>'
+    htmlContent += '<button onclick="showWeatherData()">Back</button>'
     return htmlContent;
 }
 
@@ -71,10 +71,30 @@ function createHourlyHtml(date, data) {
 async function handleHourlyData(date) {
     const hourlyWeatherData = await fetchHourlyData(date);
     if (hourlyWeatherData) {
+        const weatherDataElement = document.getElementById('weather-data');
         const hourlyDataElement = document.getElementById('hourly-data');
-        if (hourlyDataElement) {
+        
+        if (weatherDataElement && hourlyDataElement) {
+            // Hide weather data
+            weatherDataElement.style.display = 'none';
+            
+            // Show hourly data
             hourlyDataElement.innerHTML = createHourlyHtml(date, hourlyWeatherData);
+            hourlyDataElement.style.display = 'block';
         }
+    }
+}
+
+function showWeatherData() {
+    const weatherDataElement = document.getElementById('weather-data');
+    const hourlyDataElement = document.getElementById('hourly-data');
+    
+    if (weatherDataElement && hourlyDataElement) {
+        // Show weather data
+        weatherDataElement.style.display = 'block';
+        
+        // Hide hourly data
+        hourlyDataElement.style.display = 'none';
     }
 }
 

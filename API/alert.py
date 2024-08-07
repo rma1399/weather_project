@@ -1,21 +1,23 @@
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from sqlalchemy import create_engine
 import json
 
 c = open('API/info.json')
 cred = json.load(c)
-
-# Create SQLAlchemy engine
 engine = create_engine(cred[1]['link'])
 
-def get_daily_temps():
+"""
+grabs the highest and lowest temps from the requested day using SQLAcademy Engine
+"""
+def get_daily_temps(start):
     l = []
     # Getting weather data from database
-    query = "SELECT dat, MAX(temp) FROM hourly_data GROUP BY dat ORDER BY dat"
+    query = f"""SELECT dat, MAX(temp) FROM hourly_data WHERE dat = '{start}' GROUP BY dat ORDER BY dat"""
+    print(query)
     daily_highs = pd.read_sql_query(query, engine)
 
-    query = "SELECT dat, MIN(temp) FROM hourly_data GROUP BY dat ORDER BY dat"
+    query = f"""SELECT dat, MIN(temp) FROM hourly_data WHERE dat = '{start}' GROUP BY dat ORDER BY dat"""
     daily_lows = pd.read_sql_query(query, engine)
 
 
@@ -24,9 +26,12 @@ def get_daily_temps():
 
     return l
 
-def get_daily_precip():
+"""
+grabs the daily precipitation from the requested day using SQLAcademy Engine
+"""
+def get_daily_precip(start):
     l = []
-    query = "SELECT dat, SUM(precip) AS total_precip FROM hourly_data GROUP BY dat ORDER BY dat"
+    query = f"""SELECT dat, SUM(precip) AS total_precip FROM hourly_data WHERE dat = '{start}' GROUP BY dat ORDER BY dat"""
     daily_precip = pd.read_sql_query(query,engine)
 
     for i in range(len(daily_precip)):
@@ -34,9 +39,12 @@ def get_daily_precip():
 
     return l
 
-def get_weather_type():
+"""
+grabs the weather type from the requested day using SQLAcademy Engine
+"""
+def get_weather_type(start):
     l = []
-    query = "SELECT dat FROM hourly_data GROUP BY dat ORDER BY dat"
+    query = f"""SELECT dat FROM hourly_data WHERE dat = '{start}' GROUP BY dat ORDER BY dat"""
     num_days = pd.read_sql_query(query,engine)
 
     for i in range(len(num_days)):
@@ -47,7 +55,9 @@ def get_weather_type():
 
     return l
 
-
+"""
+take the hourly_data and captures which type of weather happened on the day from the precipitation and visibility data
+"""
 def hours_to_type(hours_data):
     weather_types = {'Cloudy': 0, 'Sunny': 0, 'Precip': 0, 'Partly Cloudy': 0}
 
@@ -63,8 +73,11 @@ def hours_to_type(hours_data):
 
     return max(weather_types, key=weather_types.get)
 
+"""
+trying to decipher the precipitation type using temperature
+"""
 def precip_type(dat):
-    #called wit date
+    #called with date
     query = f"SELECT MIN(real_feel), MAX(real_feel) FROM hourly_data WHERE precip > 0 AND dat = '{dat}'"
     precip_temps = pd.read_sql_query(query,engine)
 
@@ -75,11 +88,22 @@ def precip_type(dat):
     else:
         return 'Mixed Precipitation'
 
-def data():
+"""
+formalizes the data into an appropriate dictionary
+"""
+def data(day, month, year):
+    day = int(day)
+    month = int(month)
+    month +=1
+    year = int(year)
+
+    print(day, month, year)
+    start = date(year, month, day)
+
     dates = {}
-    temps = get_daily_temps()
-    precip = get_daily_precip()
-    weather = get_weather_type()
+    temps = get_daily_temps(start)
+    precip = get_daily_precip(start)
+    weather = get_weather_type(start)
 
     for i in range(len(temps)):
         temps[i].append(precip[i])
@@ -88,6 +112,9 @@ def data():
 
     return dates
 
+"""
+pulls the hourly data from the database from the requested date
+"""
 def hourly_data(dat):
     hours = {}
     query = f"SELECT * FROM hourly_data WHERE dat = '{dat}'"

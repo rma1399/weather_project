@@ -5,10 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Data</title>
     <script src="/UI/static/pipeline.js" defer></script>
+    <link rel = "stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Weather Data</h1>
-    <div id="weather-data"></div>
+    <div class="calendar-controls">
+        <select id="month-select">
+            <option value="0">January</option>
+            <option value="1">February</option>
+            <option value="2">March</option>
+            <option value="3">April</option>
+            <option value="4">May</option>
+            <option value="5">June</option>
+            <option value="6">July</option>
+            <option value="7">August</option>
+            <option value="8">September</option>
+            <option value="9">October</option>
+            <option value="10">November</option>
+            <option value="11">December</option>
+        </select>
+        <select id="year-select"></select>
+        <button id="generate-calendar">Go</button>
+    </div>
+    <table>
+        <tr>
+            <th class = "Sunday">Sunday</th>
+            <th class = "Monday">Monday</th>
+            <th class = "Tuesday">Tuesday</th> 
+            <th class = "Wednesday">Wednesday</th> 
+            <th class = "Thursday">Thursday</th> 
+            <th class = "Friday">Friday</th> 
+            <th class = "Saturday">Saturday</th>
+        </tr>
+    </table>
+    <div id="calendar-container" class="calendar-view"></div>
     <div id="hourly-data"></div>
 </body>
 </html>

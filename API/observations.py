@@ -11,7 +11,9 @@ conn_params = cred[0]
 
 precip_type = ['RAIN', 'SNOW', 'ICING', 'FREEZING RAIN', 'THUNDERSTORMS']
 
-#compares the weather forecast to see if the naming conventions contain a precipitory word
+"""
+compares the weather forecast to see if the naming conventions contain a precipitory word
+"""
 def isRaining(w):
     x = w.split(" ")
     for i in x:
@@ -20,13 +22,15 @@ def isRaining(w):
 
     return False
 
-#connect to postgres
 conn = psycopg2.connect(**conn_params)
 cursor = conn.cursor()
 
 #get json data from NWS
 forecast = requests.get('https://api.weather.gov/stations/KBED/observations').json()
 
+"""
+formats data into appropriate types and parses NWS json. Converts metric units into American units
+"""
 for i in range(len(forecast['features'])-1,0,-1):
     timestamp = str(forecast['features'][i]['properties']['timestamp'])
     dt = datetime.fromisoformat(timestamp)
@@ -35,7 +39,7 @@ for i in range(len(forecast['features'])-1,0,-1):
     hour = (int(dt.time().strftime('%H'))+20)%24
     if int(dt.time().strftime('%H')) < hour:
         date = date-timedelta(days=1)
-    if forecast['features'][i]['properties']['temperature']['value'] is not None:
+    if forecast['features'][i]['properties']['temperature']['value'] is not None and forecast['features'][i]['properties']['dewpoint']['value'] is not None:
         temp = round(float(forecast['features'][i]['properties']['temperature']['value'])*9.0/5.0+32,2)
     
         dewPoint = round(float(forecast['features'][i]['properties']['dewpoint']['value'])*9.0/5.0,2)+32

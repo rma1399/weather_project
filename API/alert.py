@@ -31,7 +31,10 @@ grabs the daily precipitation from the requested day using SQLAcademy Engine
 """
 def get_daily_precip(start):
     l = []
-    query = f"""SELECT dat, SUM(precip) AS total_precip FROM hourly_data WHERE dat = '{start}' GROUP BY dat ORDER BY dat"""
+    query = f"""
+    SELECT SUM(precip) AS total_precip
+    FROM (
+    SELECT DISTINCT tim, precip FROM hourly_data WHERE dat = '{start}' ORDER BY tim)"""
     daily_precip = pd.read_sql_query(query,engine)
 
     for i in range(len(daily_precip)):

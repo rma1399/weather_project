@@ -60,9 +60,9 @@ for i in range(len(forecast['features'])-1,0,-1):
         humidity = round(float(forecast['features'][i]['properties']['relativeHumidity']['value'])/100.0,2)
     
         realFeel = temp
-        if temp>=80:
+        if temp>=80 and forecast['features'][i]['properties']['heatIndex']['value'] is not None:
             realFeel = int(forecast['features'][i]['properties']['heatIndex']['value'])*9.0/5.0+32
-        elif temp<=50:
+        elif temp<=50 and forecast['features'][i]['properties']['windChill']['value'] is not None:
             realFeel = int(forecast['features'][i]['properties']['windChill']['value'])*9.0/5.0+32,
     
         rain = isRaining(forecast['features'][i]['properties']['textDescription'])

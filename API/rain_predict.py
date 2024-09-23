@@ -1,5 +1,6 @@
 import pandas as pd
 import tensorflow as tf
+from keras import layers, models
 from datetime import datetime, timedelta, date
 from sqlalchemy import create_engine
 import json
@@ -16,7 +17,7 @@ def testing_frame():
     df = pd.DataFrame()
     for i in range(3, len(otp)):
         row = {}
-        for j in range(0,3):
+        for j in range(0,4):
             if j == 0:
                 row['rain'] = otp.iloc[i]['rain']
             else:
@@ -24,8 +25,36 @@ def testing_frame():
                     row[f'{j} {x}'] = otp.iloc[i-j][x]
         df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
     
+    #to label encoding
+    for i in df:
+        if i.iloc[0]:
+            return 0
     return df
 
 training_data = testing_frame()
 
 
+#def rain_prediction(): call this once the model has been trained, reqeusts, prediction, post
+
+#nuearal network, logistical regression, decision tree
+def build_neural_network():
+    
+    #netowrk build
+    model = models.Sequential()
+    model.add(layers.Flatten())
+    model.add(layers.Dense(64, activation='sigmoid'))
+    model.add(layers.Dense(20))
+
+    return model
+
+def training(model, training_data):
+
+    model.compile(optimizer='adam',
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+            metrics=['accuracy'])
+    history = model.fit(training_data, epochs=10,
+    validation_data=(training_data))
+
+
+model = build_neural_network()
+training(model, training_data)

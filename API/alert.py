@@ -51,7 +51,7 @@ def get_weather_type(start):
     num_days = pd.read_sql_query(query,engine)
 
     for i in range(len(num_days)):
-        query = f"SELECT dat, temp, precip, visibility FROM hourly_data WHERE dat = '{num_days.iloc[i]['dat']}'"
+        query = f"SELECT dat, temp, precip, visibility, rain FROM hourly_data WHERE dat = '{num_days.iloc[i]['dat']}'"
         hourly_days = pd.read_sql_query(query,engine)
 
         l.append(hours_to_type(hourly_days))
@@ -65,7 +65,7 @@ def hours_to_type(hours_data):
     weather_types = {'Cloudy': 0, 'Sunny': 0, 'Precip': 0, 'Partly Cloudy': 0}
 
     for i in range(len(hours_data)):
-        if float(hours_data.iloc[i]['precip'])>0:
+        if float(hours_data.iloc[i]['precip'])>0 or hours_data.iloc[i]['rain']:
             return precip_type(hours_data.iloc[i]['dat'])
         elif int(hours_data.iloc[i]['visibility'])>=8:
             weather_types['Sunny']+=1
@@ -81,7 +81,7 @@ trying to decipher the precipitation type using temperature
 """
 def precip_type(dat):
     #called with date
-    query = f"SELECT MIN(real_feel), MAX(real_feel) FROM hourly_data WHERE precip > 0 AND dat = '{dat}'"
+    query = f"SELECT MIN(real_feel), MAX(real_feel) FROM hourly_data WHERE dat = '{dat}' AND rain = 't'"
     precip_temps = pd.read_sql_query(query,engine)
 
     if precip_temps.iloc[0]['min']>32:

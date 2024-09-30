@@ -3,6 +3,7 @@ import tensorflow as tf
 from keras import layers, models
 from datetime import datetime, timedelta, date
 from sqlalchemy import create_engine
+from sklearn.preprocessing import LabelEncoder
 import json
 
 c = open('API/info.json')
@@ -10,6 +11,8 @@ cred = json.load(c)
 engine = create_engine(cred[1]['link'])
 
 def testing_frame():
+    le = LabelEncoder()
+
     types = ['dat','tim','temp', 'real_feel', 'dew_point','humidity', 'wind_speed', 'rain', 'precip', 'visibility', 'pressure']
     query = """SELECT * FROM hourly_data"""
     otp = pd.read_sql_query(query, engine)
@@ -25,10 +28,12 @@ def testing_frame():
                     row[f'{j} {x}'] = otp.iloc[i-j][x]
         df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
     
-    #to label encoding
-    for i in df:
-        if i.iloc[0]:
-            return 0
+    for col in df.columns.tolist():
+        tp = df[col].dtype
+        if tp != 'float64' and tp != 'int64':
+            df[col] = le.fit_transform(df[col])
+
+    print(df)
     return df
 
 training_data = testing_frame()

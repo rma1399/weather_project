@@ -3,6 +3,7 @@ from flask_cors import CORS
 import os
 import sys
 import alert
+import rain_predict
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 app = Flask(__name__, static_folder='../UI/static', template_folder='../UI/templates')
@@ -43,6 +44,19 @@ def get_hourly_weather():
             return jsonify({'error': 'Date not found'}), 404
     else:
         return jsonify({'error': 'Date parameter is required'}), 400
+    
+@app.route('/api/rain_predict', methods=['GET'])
+def get_rain_prediction():
+    station = request.args.get('station')
+    print(station)
+    if station:
+        pred = rain_predict.rain_predict(station)
+        if pred:
+            return jsonify(pred)
+        else:
+            return jsonify({'error': 'Insufficient data for station'}), 404
+    else:
+        return jsonify({'error': 'Station parameter is required'}), 400
 
 
 if __name__ == '__main__':

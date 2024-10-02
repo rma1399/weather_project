@@ -40,5 +40,15 @@
     </table>
     <div id="calendar-container" class="calendar-view"></div>
     <div id="hourly-data"></div>
+    <div id="rainfall-predictor">
+        <label for="observation-select">Select Observation Station:</label>
+        <select id="observation-select">
+            <option value="KBED">KBED</option>
+            <!-- Add more options as needed -->
+        </select>
+        <button id="generate-pred" aria-label="Generate Rainfall Prediction">Go</button>
+    </div>
+
+    <div id="rainfall-output"></div>
 </body>
 </html>

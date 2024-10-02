@@ -1,4 +1,35 @@
 
+document.addEventListener("DOMContentLoaded", function() {
+    const station = document.getElementById("observation-select");
+    const rainfall_output = document.getElementById("rainfall-output");
+
+    document.getElementById("generate-pred").addEventListener("click", generatePrediction);
+
+    async function generatePrediction() {
+        try {
+            const pred = await fetchRainPrediction(station.value);
+            rainfall_output.innerHTML = `<h3>${pred}</h3>`;
+        } catch (error) {
+            console.error('Error fetching rain prediction:', error);
+            rainfall_output.innerHTML = `<h3>Error fetching prediction</h3>`;
+        }
+    }
+});
+
+async function fetchRainPrediction(station){
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/api/rain_predict?station=${station}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return null;
+    }
+}
+
 /**
  * Watches for updates on the month and year change when the go button is being pressed
  */
